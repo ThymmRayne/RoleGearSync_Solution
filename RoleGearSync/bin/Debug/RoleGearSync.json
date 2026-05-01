@@ -6,6 +6,14 @@
   "Description": "A tool for Omni-100 players. Updates and saves the 'Optimize Gear' function for all healers, tanks, etc. with a single click.",
   "ApplicableVersion": "any",
   "RepoUrl": "[https://github.com/ThymmRayne/RoleGearSync](https://github.com/ThymmRayne/RoleGearSync)",
+  "Tags": [
+    "gear",
+    "sync",
+    "role",
+    "equipment",
+    "qol",
+    "omni"
+  ],
   "DalamudApiLevel": 15,
   "LoadRequiredState": 0,
   "LoadSync": false,
