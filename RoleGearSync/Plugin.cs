@@ -27,6 +27,7 @@ namespace RoleGearSync
 
         // UI State
         private bool isUiVisible = false;
+        private bool isConfigVisible = false;
 
         // State Machine Variablen für Ansatz A
         private enum SyncState
@@ -82,7 +83,7 @@ namespace RoleGearSync
             this.PluginInterface.UiBuilder.OpenMainUi += () => isUiVisible = true;
             
             // Optional: Fenster über die Plugin-Einstellungen öffnen
-            this.PluginInterface.UiBuilder.OpenConfigUi += () => isUiVisible = true;
+            this.PluginInterface.UiBuilder.OpenConfigUi += () => isConfigVisible = true;
 
             this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             this.Configuration.Initialize(this.PluginInterface);
@@ -93,7 +94,7 @@ namespace RoleGearSync
             // Event-Handler sauber abmelden
             this.PluginInterface.UiBuilder.Draw -= DrawUI;
             this.PluginInterface.UiBuilder.OpenMainUi -= () => isUiVisible = true;
-            this.PluginInterface.UiBuilder.OpenConfigUi -= () => isUiVisible = true;
+            this.PluginInterface.UiBuilder.OpenConfigUi -= () => isConfigVisible = true;
             this.Framework.Update -= OnFrameworkUpdate;
             this.CommandManager.RemoveHandler(CommandName);
         }
@@ -137,70 +138,75 @@ namespace RoleGearSync
 
         private unsafe void DrawUI()
         {
-            if (!isUiVisible) return;
-
-            // Zeichnet ein einfaches Fenster, das sich an den Inhalt anpasst
-            if (ImGui.Begin("RoleGearSync Menu", ref isUiVisible, ImGuiWindowFlags.AlwaysAutoResize))
+            // -----------------------------------------
+            // 1. HAUPTMENÜ (Öffnet sich bei /syncgear oder "Open")
+            // -----------------------------------------
+            if (isUiVisible)
             {
-                ImGui.Text("Choose a role to optimize:");
-                ImGui.Separator();
-                ImGui.Spacing();
-
-                // Disable buttons if optimization is currently running
-                if (currentState != SyncState.Idle)
+                if (ImGui.Begin("RoleGearSync Menu", ref isUiVisible, ImGuiWindowFlags.AlwaysAutoResize))
                 {
-                    ImGui.BeginDisabled();
-                }
-
-                // UI Buttons
-                if (ImGui.Button("Optimize Tanks", new System.Numerics.Vector2(200, 30))) ExecuteSync("tank");
-                if (ImGui.Button("Optimize Healers", new System.Numerics.Vector2(200, 30))) ExecuteSync("healer");
-                if (ImGui.Button("Optimize Melee", new System.Numerics.Vector2(200, 30))) ExecuteSync("melee");
-                if (ImGui.Button("Optimize Ranged", new System.Numerics.Vector2(200, 30))) ExecuteSync("ranged");
-                if (ImGui.Button("Optimize Caster", new System.Numerics.Vector2(200, 30))) ExecuteSync("caster");
-
-                if (currentState != SyncState.Idle)
-                {
-                    ImGui.EndDisabled();
-                    ImGui.Spacing();
-                    ImGui.TextColored(new System.Numerics.Vector4(1.0f, 0.5f, 0.0f, 1.0f), "Optimization running...");
-                }
-                    ImGui.Spacing();
+                    ImGui.Text("Choose a role to optimize:");
                     ImGui.Separator();
                     ImGui.Spacing();
 
-                if (ImGui.CollapsingHeader("Settings / Ignored Sets"))
-                {
-                    ImGui.TextWrapped("Check the boxes to exclude specific gearsets from being optimized.");
-                    ImGui.Spacing();
-
-                    var gearsetModule = RaptureGearsetModule.Instance();
-                    for (int i = 0; i < 100; i++)
+                    if (currentState != SyncState.Idle)
                     {
-                        var gs = gearsetModule->GetGearset(i);
-                        // Nur belegte Gearsets anzeigen
-                        if (gs != null && gs->ClassJob != 0) 
-                        {
-                            bool isIgnored = this.Configuration.IgnoredGearsets.Contains(i);
-                            
-                            // i+1, weil die Liste im Spiel bei 1 anfängt, der Index aber bei 0
-                            if (ImGui.Checkbox($"Gearset {i + 1} (Job-ID: {gs->ClassJob})", ref isIgnored))
-                            {
-                                if (isIgnored) 
-                                    this.Configuration.IgnoredGearsets.Add(i);
-                                else 
-                                    this.Configuration.IgnoredGearsets.Remove(i);
-                                
-                                // Direkt speichern, wenn ein Häkchen gesetzt/entfernt wird
-                                this.Configuration.Save(); 
-                            }
-                        }
+                        ImGui.BeginDisabled();
+                    }
+
+                    if (ImGui.Button("Optimize Tanks", new System.Numerics.Vector2(200, 30))) ExecuteSync("tank");
+                    if (ImGui.Button("Optimize Healers", new System.Numerics.Vector2(200, 30))) ExecuteSync("healer");
+                    if (ImGui.Button("Optimize Melee", new System.Numerics.Vector2(200, 30))) ExecuteSync("melee");
+                    if (ImGui.Button("Optimize Ranged", new System.Numerics.Vector2(200, 30))) ExecuteSync("ranged");
+                    if (ImGui.Button("Optimize Caster", new System.Numerics.Vector2(200, 30))) ExecuteSync("caster");
+
+                    if (currentState != SyncState.Idle)
+                    {
+                        ImGui.EndDisabled();
+                        ImGui.Spacing();
+                        ImGui.TextColored(new System.Numerics.Vector4(1.0f, 0.5f, 0.0f, 1.0f), "Optimization running...");
                     }
                 }
-
                 ImGui.End();
             }
+
+    // -----------------------------------------
+    // 2. EINSTELLUNGEN (Öffnet sich beim Klick auf "Einstellungen")
+    // -----------------------------------------
+    if (isConfigVisible)
+    {
+        if (ImGui.Begin("RoleGearSync Settings", ref isConfigVisible, ImGuiWindowFlags.AlwaysAutoResize))
+        {
+            ImGui.TextWrapped("Check the boxes to exclude specific gearsets from being optimized.");
+            ImGui.Spacing();
+            ImGui.Separator();
+            ImGui.Spacing();
+
+            var gearsetModule = RaptureGearsetModule.Instance();
+            for (int i = 0; i < 100; i++)
+            {
+                var gs = gearsetModule->GetGearset(i);
+                
+                // Nur belegte Gearsets anzeigen
+                if (gs != null && gs->ClassJob != 0) 
+                {
+                    bool isIgnored = this.Configuration.IgnoredGearsets.Contains(i);
+                    
+                    if (ImGui.Checkbox($"Gearset {i + 1} (Job-ID: {gs->ClassJob})", ref isIgnored))
+                    {
+                        if (isIgnored) 
+                            this.Configuration.IgnoredGearsets.Add(i);
+                        else 
+                            this.Configuration.IgnoredGearsets.Remove(i);
+                        
+                        this.Configuration.Save(); 
+                    }
+                }
+            }
         }
+        ImGui.End();
+    }
+}
 
         private unsafe List<int> GetGearsetsForRole(string role)
         {
