@@ -27,7 +27,10 @@ namespace RoleGearSync
             Idle,
             SwitchingJob,
             WaitingForSwitch,
-            OptimizingGear,
+            SetupOptimization,
+            WaitingForCalculation,
+            EquippingGear,
+            WaitingForEquip,
             SavingGearset
         }
 
@@ -165,7 +168,7 @@ namespace RoleGearSync
                     var gearsetModule = RaptureGearsetModule.Instance();
                     gearsetModule->EquipGearset(currentTargetGearset);
                     
-                    waitFrames = 30; // Wir warten kurz (~0.5 Sekunden bei 60fps), bis der Jobwechsel durch ist
+                    waitFrames = 60; // Etwas länger warten (~1 Sekunde), falls der Server-Ping hoch ist
                     currentState = SyncState.WaitingForSwitch;
                     break;
 
@@ -173,35 +176,52 @@ namespace RoleGearSync
                     waitFrames--;
                     if (waitFrames <= 0)
                     {
-                        currentState = SyncState.OptimizingGear;
+                        currentState = SyncState.SetupOptimization;
                     }
                     break;
 
-                case SyncState.OptimizingGear:
-                    // RecommendEquipModule aufrufen
-                    var recommendModule = RecommendEquipModule.Instance();
+                case SyncState.SetupOptimization:
+                    var recommendModuleSetup = RecommendEquipModule.Instance();
                     
-                    // 1. Berechnet im Hintergrund die optimale Ausrüstung (NEUE METHODE FÜR DAWNTRAIL)
-                    recommendModule->SetupForClassJob((byte)ObjectTable.LocalPlayer.ClassJob.RowId);
+                    // 1. Berechne im Hintergrund die optimale Ausrüstung
+                    recommendModuleSetup->SetupForClassJob((byte)ObjectTable.LocalPlayer.ClassJob.RowId);
                     
-                    // 2. Wendet die berechnete Ausrüstung auf den Charakter an (NEUE METHODE FÜR DAWNTRAIL)
-                    // FFXIVClientStructs Update: EquipRecommendedGear() anstelle von Equip() - Jetzt mit () Klammern!
-                    recommendModule->EquipRecommendedGear();
-                    
-                    waitFrames = 10; // Kurz warten, bis das Spiel die Items angelegt hat
-                    currentState = SyncState.SavingGearset;
+                    waitFrames = 15; // WICHTIG: Gib dem Spiel Zeit, das Arsenal zu durchsuchen!
+                    currentState = SyncState.WaitingForCalculation;
                     break;
-                    
-                case SyncState.SavingGearset:
+
+                case SyncState.WaitingForCalculation:
                     waitFrames--;
                     if (waitFrames <= 0)
                     {
-                        // RaptureGearsetModule nutzen, um das Set zu überschreiben/speichern
-                        var gearsetModuleUpdate = RaptureGearsetModule.Instance();
-                        gearsetModuleUpdate->UpdateGearset(currentTargetGearset);
-                        
-                        currentState = SyncState.SwitchingJob; // Nächster Job in der Queue
+                        currentState = SyncState.EquippingGear;
                     }
+                    break;
+
+                case SyncState.EquippingGear:
+                    var recommendModuleEquip = RecommendEquipModule.Instance();
+                    
+                    // 2. Wende die berechnete Ausrüstung an
+                    recommendModuleEquip->EquipRecommendedGear();
+                    
+                    waitFrames = 30; // Warten, bis der Server die neuen Items bestätigt hat
+                    currentState = SyncState.WaitingForEquip;
+                    break;
+                    
+                case SyncState.WaitingForEquip:
+                    waitFrames--;
+                    if (waitFrames <= 0)
+                    {
+                        currentState = SyncState.SavingGearset;
+                    }
+                    break;
+                    
+                case SyncState.SavingGearset:
+                    // RaptureGearsetModule nutzen, um das Set zu überschreiben/speichern
+                    var gearsetModuleUpdate = RaptureGearsetModule.Instance();
+                    gearsetModuleUpdate->UpdateGearset(currentTargetGearset);
+                    
+                    currentState = SyncState.SwitchingJob; // Nächster Job in der Queue
                     break;
             }
         }
