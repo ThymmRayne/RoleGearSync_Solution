@@ -144,7 +144,7 @@ namespace RoleGearSync
                     
                     // 2. Wendet die berechnete Ausrüstung auf den Charakter an (NEUE METHODE FÜR DAWNTRAIL)
                     // FFXIVClientStructs Update: EquipRecommendedGear() anstelle von Equip()
-                    recommendModule->EquipRecommendedGear;
+                    recommendModule->EquipRecommendedGear();
                     
                     waitFrames = 10; // Kurz warten, bis das Spiel die Items angelegt hat
                     currentState = SyncState.SavingGearset;
