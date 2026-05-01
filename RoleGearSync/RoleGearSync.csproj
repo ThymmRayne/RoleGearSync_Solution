@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Wir nutzen das offizielle Dalamud SDK -->
-<Project Sdk="Dalamud.NET.Sdk/15.0.0">
+<!-- Wir nutzen das Dalamud SDK ohne feste Version, um Kompatibilitätsprobleme zu vermeiden -->
+<Project Sdk="Dalamud.NET.Sdk">
 
   <PropertyGroup>
     <Authors>Cycrow</Authors>
     <Company>-</Company>
     <Version>1.0.0.0</Version>
     <Description>Synchronisiert Ausrüstung für FFXIV Rollen.</Description>
-    <Copyright></Copyright>
     <PackageProjectUrl>https://github.com/ThymmRayne/RoleGearSync_Solution</PackageProjectUrl>
   </PropertyGroup>
 
@@ -18,11 +17,17 @@
     <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <!-- Wir definieren den Pfad explizit, falls die automatische Erkennung fehlschlägt -->
+    <DalamudLibPath Condition="'$(DalamudLibPath)' == ''">$(AppData)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
   </PropertyGroup>
 
-  <!-- Fix für ImGui in Dawntrail / API 15 -->
   <ItemGroup>
+    <!-- Fix für ImGui in API 15: Wir sagen dem Compiler, dass 'ImGuiNET' in dieser DLL liegt -->
     <Reference Include="ImGui.NET">
+      <HintPath>$(DalamudLibPath)Dalamud.Bindings.ImGui.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Dalamud.Bindings.ImGui">
       <HintPath>$(DalamudLibPath)Dalamud.Bindings.ImGui.dll</HintPath>
       <Private>false</Private>
     </Reference>
