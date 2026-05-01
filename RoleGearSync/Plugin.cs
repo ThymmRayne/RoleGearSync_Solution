@@ -180,63 +180,34 @@ namespace RoleGearSync
         {
             ImGui.TextWrapped("Check the boxes to exclude specific gearsets from being optimized.");
             ImGui.Spacing();
+            ImGui.Separator();
+            ImGui.Spacing();
 
-            // Scrollbarer Bereich (Child-Window), damit das Hauptfenster nicht explodiert
-            if (ImGui.BeginChild("GearsetListScroll", new System.Numerics.Vector2(450, 350), true))
+            var gearsetModule = RaptureGearsetModule.Instance();
+            for (int i = 0; i < 100; i++)
             {
-                // Schicke Tabelle mit 3 Spalten und abwechselnden Zeilenfarben
-                if (ImGui.BeginTable("GearsetTable", 3, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit))
+                var gs = gearsetModule->GetGearset(i);
+                
+                // Nur belegte Gearsets anzeigen
+                if (gs != null && gs->ClassJob != 0) 
                 {
-                    ImGui.TableSetupColumn("Ignore", ImGuiTableColumnFlags.WidthFixed, 50f);
-                    ImGui.TableSetupColumn("Set", ImGuiTableColumnFlags.WidthFixed, 40f);
-                    ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
-                    ImGui.TableHeadersRow();
-
-                    var gearsetModule = RaptureGearsetModule.Instance();
-                    for (int i = 0; i < 100; i++)
+                    bool isIgnored = this.Configuration.IgnoredGearsets.Contains(i);
+                    
+                    if (ImGui.Checkbox($"Gearset {i + 1} (Job-ID: {gs->ClassJob})", ref isIgnored))
                     {
-                        var gs = gearsetModule->GetGearset(i);
+                        if (isIgnored) 
+                            this.Configuration.IgnoredGearsets.Add(i);
+                        else 
+                            this.Configuration.IgnoredGearsets.Remove(i);
                         
-                        if (gs != null)
-                        {
-                            // Wir lesen den echten Namen deines Gearsets aus dem Speicher
-                            string setName = MemoryHelper.ReadStringNullTerminated((nint)gs->Name);
-                            
-                            // Ist der Name leer, existiert in diesem Slot kein Gearset
-                            if (string.IsNullOrEmpty(setName)) continue;
-
-                            bool isIgnored = this.Configuration.IgnoredGearsets.Contains(i);
-
-                            ImGui.TableNextRow();
-                            
-                            // Spalte 1: Checkbox (das ## sorgt dafür, dass kein Text neben der Box steht)
-                            ImGui.TableNextColumn();
-                            if (ImGui.Checkbox($"##ignore_{i}", ref isIgnored))
-                            {
-                                if (isIgnored) 
-                                    this.Configuration.IgnoredGearsets.Add(i);
-                                else 
-                                    this.Configuration.IgnoredGearsets.Remove(i);
-                                
-                                this.Configuration.Save(); 
-                            }
-
-                            // Spalte 2: Die Ingame Set-Nummer
-                            ImGui.TableNextColumn();
-                            ImGui.Text($"{i + 1}");
-
-                            // Spalte 3: Der echte Set-Name, den du vergeben hast
-                            ImGui.TableNextColumn();
-                            ImGui.Text($"{setName}");
-                        }
+                        this.Configuration.Save(); 
                     }
-                    ImGui.EndTable();
                 }
-                ImGui.EndChild();
             }
         }
         ImGui.End();
     }
+}
 
         private unsafe List<int> GetGearsetsForRole(string role)
         {
