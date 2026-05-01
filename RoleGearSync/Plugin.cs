@@ -143,7 +143,8 @@ namespace RoleGearSync
                     recommendModule->SetupForClassJob((byte)ObjectTable.LocalPlayer.ClassJob.RowId);
                     
                     // 2. Wendet die berechnete Ausrüstung auf den Charakter an (NEUE METHODE FÜR DAWNTRAIL)
-                    recommendModule->Equip();
+                    // FFXIVClientStructs Update: EquipRecommendedGear() anstelle von Equip()
+                    recommendModule->EquipRecommendedGear();
                     
                     waitFrames = 10; // Kurz warten, bis das Spiel die Items angelegt hat
                     currentState = SyncState.SavingGearset;
