@@ -136,6 +136,7 @@ namespace RoleGearSync
                 ToastGui.ShowError($"RoleGearSync: No sets found for '{role}'.\nUse: healer, tank, melee, ranged, caster");
             }
         }
+        
         private unsafe void DrawUI()
         {
             // -----------------------------------------
