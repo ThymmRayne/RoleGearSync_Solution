@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Dalamud.NET.Sdk/15.0.0">
-
   <PropertyGroup>
     <Authors>Cycrow</Authors>
     <Company>-</Company>
@@ -16,24 +15,5 @@
     <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    
-    <!-- HOLZHAMMER-METHODE: Wir nutzen deinen exakten Windows-Pfad -->
-    <DalamudLibPath>C:\Users\domih\AppData\Roaming\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Reference Include="Dalamud.Bindings.ImGui">
-      <HintPath>$(DalamudLibPath)Dalamud.Bindings.ImGui.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="ImGui.NET">
-      <HintPath>$(DalamudLibPath)Dalamud.Bindings.ImGui.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="HexaGen.Runtime">
-      <HintPath>$(DalamudLibPath)HexaGen.Runtime.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-
 </Project>

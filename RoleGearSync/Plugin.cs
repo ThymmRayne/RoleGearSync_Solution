@@ -2,7 +2,7 @@ using Dalamud.Game.Command;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System.Collections.Generic;
 
 namespace RoleGearSync
