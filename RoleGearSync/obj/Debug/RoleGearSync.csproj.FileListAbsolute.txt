@@ -4,3 +4,6 @@ C:\Users\domih\source\repos\RoleGearSync_Solution\RoleGearSync\obj\Debug\RoleGea
 C:\Users\domih\source\repos\RoleGearSync_Solution\RoleGearSync\obj\Debug\RoleGearSync.AssemblyInfo.cs
 C:\Users\domih\source\repos\RoleGearSync_Solution\RoleGearSync\obj\Debug\RoleGearSync.csproj.CoreCompileInputs.cache
 C:\Users\domih\source\repos\RoleGearSync_Solution\RoleGearSync\obj\Debug\RoleGearSync.sourcelink.json
+C:\Users\domih\source\repos\RoleGearSync_Solution\RoleGearSync\bin\Debug\RoleGearSync.deps.json
+C:\Users\domih\source\repos\RoleGearSync_Solution\RoleGearSync\bin\Debug\RoleGearSync.dll
+C:\Users\domih\source\repos\RoleGearSync_Solution\RoleGearSync\obj\Debug\RoleGearSync.dll
