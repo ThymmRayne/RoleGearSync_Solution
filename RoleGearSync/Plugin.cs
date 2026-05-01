@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------
+// Concept, Logic & Testing: Cycrow
+// Code Refactoring & UI Implementation assisted by AI
+// ------------------------------------------------------------------------------
 using Dalamud.Game.Command;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
