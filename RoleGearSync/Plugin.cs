@@ -2,7 +2,6 @@ using Dalamud.Game.Command;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
-using System;
 using System.Collections.Generic;
 
 namespace RoleGearSync
@@ -18,6 +17,9 @@ namespace RoleGearSync
         private IChatGui ChatGui { get; init; }
         private IFramework Framework { get; init; }
         private IClientState ClientState { get; init; }
+        
+        // NEU: ObjectTable für Dawntrail API hinzugefügt
+        private IObjectTable ObjectTable { get; init; }
 
         // State Machine Variablen für Ansatz A
         private enum SyncState
@@ -39,13 +41,15 @@ namespace RoleGearSync
             ICommandManager commandManager,
             IChatGui chatGui,
             IFramework framework,
-            IClientState clientState)
+            IClientState clientState,
+            IObjectTable objectTable) // NEU im Konstruktor
         {
             this.PluginInterface = pluginInterface;
             this.CommandManager = commandManager;
             this.ChatGui = chatGui;
             this.Framework = framework;
             this.ClientState = clientState;
+            this.ObjectTable = objectTable; // NEU zugewiesen
 
             // Command registrieren
             this.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
@@ -99,7 +103,8 @@ namespace RoleGearSync
         // Diese Methode wird JEDEN FRAME aufgerufen (Ansatz A Logik)
         private unsafe void OnFrameworkUpdate(IFramework framework)
         {
-            if (currentState == SyncState.Idle || ClientState.LocalPlayer == null)
+            // Dawntrail API Update: Wir nutzen IsLoggedIn und das ObjectTable
+            if (currentState == SyncState.Idle || !ClientState.IsLoggedIn || ObjectTable.LocalPlayer == null)
                 return;
 
             switch (currentState)
@@ -134,10 +139,11 @@ namespace RoleGearSync
                     // RecommendEquipModule aufrufen
                     var recommendModule = RecommendEquipModule.Instance();
                     
-                    // 1. Berechnet im Hintergrund die optimale Ausrüstung
-                    recommendModule->SetupRecommendEquip();
-                    // 2. Wendet die berechnete Ausrüstung auf den Charakter an
-                    recommendModule->EquipRecommendEquip();
+                    // 1. Berechnet im Hintergrund die optimale Ausrüstung (NEUE METHODE FÜR DAWNTRAIL)
+                    recommendModule->SetupForClassJob((byte)ObjectTable.LocalPlayer.ClassJob.RowId);
+                    
+                    // 2. Wendet die berechnete Ausrüstung auf den Charakter an (NEUE METHODE FÜR DAWNTRAIL)
+                    recommendModule->Equip();
                     
                     waitFrames = 10; // Kurz warten, bis das Spiel die Items angelegt hat
                     currentState = SyncState.SavingGearset;
