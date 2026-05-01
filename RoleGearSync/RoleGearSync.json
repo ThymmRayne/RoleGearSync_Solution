@@ -4,9 +4,9 @@
   "InternalName": "RoleGearSync",
   "Punchline": "Synchronisiert Ausrüstung über mehrere Jobs einer Rolle.",
   "Description": "Ein Tool für Omni-100 Spieler. Aktualisiere und speichere automatisch die 'Ausrüstung optimieren'-Funktion für alle Heiler, Tanks etc. mit nur einem Klick.",
-  "RepoUrl": "[https://github.com/ThymmRayne/RoleGearSync_Solution](https://github.com/ThymmRayne/RoleGearSync_Solution)",
+  "RepoUrl": "[https://github.com/ThymmRayne/RoleGearSync](https://github.com/ThymmRayne/RoleGearSync)",
   "ApplicableVersion": "any",
-  "DalamudApiLevel": 10,
+  "DalamudApiLevel": 15,
   "LoadRequiredState": 0,
   "LoadSync": false,
   "CanUnloadAsync": false
