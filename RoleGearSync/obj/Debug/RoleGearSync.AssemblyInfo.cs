@@ -12,9 +12,9 @@ using System.Reflection;
 
 [assembly: System.Reflection.AssemblyCompanyAttribute("-")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
-[assembly: System.Reflection.AssemblyDescriptionAttribute("Synchronisiert Ausrüstung für FFXIV Rollen.")]
+[assembly: System.Reflection.AssemblyDescriptionAttribute("Synchronizes gear sets for all jobs within a role.")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0.0+778cb320f50487c787dfd2b180634de22e3ab581")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0.0+6e545f660febcf8cc2dd34fd5a4f1e5cf65c32ea")]
 [assembly: System.Reflection.AssemblyProductAttribute("RoleGearSync")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RoleGearSync")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
