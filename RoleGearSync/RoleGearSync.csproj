@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Wir nutzen das offizielle Dalamud SDK -->
-<Project Sdk="Dalamud.NET.Sdk/14.1.1">
+<Project Sdk="Dalamud.NET.Sdk/14.1.0">
 
   <PropertyGroup>
     <Authors>Cycrow</Authors>
