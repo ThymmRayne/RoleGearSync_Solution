@@ -8,7 +8,7 @@
     <Version>1.0.0.0</Version>
     <Description>Synchronisiert Ausrüstung für FFXIV Rollen.</Description>
     <Copyright></Copyright>
-    <PackageProjectUrl>[https://github.com/ThymmRayne/RoleGearSync_Solution](https://github.com/ThymmRayne/RoleGearSync_Solution)</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/ThymmRayne/RoleGearSync_Solution</PackageProjectUrl>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -20,8 +20,12 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
+  <!-- Fix für ImGui in Dawntrail / API 15 -->
   <ItemGroup>
-    <Reference Include="Dalamud.Bindings.ImGui" />
+    <Reference Include="ImGui.NET">
+      <HintPath>$(DalamudLibPath)Dalamud.Bindings.ImGui.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
   </ItemGroup>
 
 </Project>
