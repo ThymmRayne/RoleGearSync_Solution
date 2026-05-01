@@ -135,7 +135,7 @@ namespace RoleGearSync
             }
         }
 
-        private void DrawUI()
+        private unsafe void DrawUI()
         {
             if (!isUiVisible) return;
 
@@ -213,7 +213,7 @@ namespace RoleGearSync
             var ranged = new HashSet<byte> { 5, 23, 31, 38 };
             var caster = new HashSet<byte> { 7, 26, 25, 27, 35, 36, 42 };
 
-            HashSet<byte> targetRole = null;
+            HashSet<byte>? targetRole = null;
             switch(role) {
                 case "healer": targetRole = healers; break;
                 case "tank": targetRole = tanks; break;
