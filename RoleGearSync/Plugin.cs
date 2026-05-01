@@ -22,6 +22,8 @@ namespace RoleGearSync
         private IClientState ClientState { get; init; }
         private IObjectTable ObjectTable { get; init; }
         private ICondition Condition { get; init; }
+        private IToastGui ToastGui { get; init; }
+        private Configuration Configuration { get; init; }
 
         // UI State
         private bool isUiVisible = false;
@@ -52,7 +54,8 @@ namespace RoleGearSync
             IFramework framework,
             IClientState clientState,
             IObjectTable objectTable,
-            ICondition condition)
+            ICondition condition,
+            IToastGui toastGui)
         {
             this.PluginInterface = pluginInterface;
             this.CommandManager = commandManager;
@@ -61,6 +64,7 @@ namespace RoleGearSync
             this.ClientState = clientState;
             this.ObjectTable = objectTable;
             this.Condition = condition;
+            this.ToastGui = toastGui;
 
             // Command registrieren
             this.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
@@ -79,6 +83,9 @@ namespace RoleGearSync
             
             // Optional: Fenster über die Plugin-Einstellungen öffnen
             this.PluginInterface.UiBuilder.OpenConfigUi += () => isUiVisible = true;
+
+            this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+            this.Configuration.Initialize(this.PluginInterface);
         }
 
         public void Dispose()
@@ -111,7 +118,7 @@ namespace RoleGearSync
             // Check if we are in combat or in a duty
             if (Condition[ConditionFlag.InCombat] || Condition[ConditionFlag.BoundByDuty])
             {
-                ChatGui.PrintError("[RoleGearSync] Cannot optimize gear during combat or inside a duty.");
+                ToastGui.ShowError($"RoleGearSync: Cannot optimize gear during combat or inside a duty.");
                 return;
             }
 
@@ -120,11 +127,11 @@ namespace RoleGearSync
             if (sets.Count > 0)
             {
                 StartSyncProcess(sets);
-                ChatGui.Print($"[RoleGearSync] Starting optimization for {sets.Count} {role}-Set(s)...");
+                ToastGui.ShowNormal($"RoleGearSync: Starting optimization for {sets.Count} {role}-Set(s)...");
             }
             else
             {
-                ChatGui.PrintError($"[RoleGearSync] No sets found for '{role}'.\nUse: healer, tank, melee, ranged, caster");
+                ToastGui.ShowError($"RoleGearSync: No sets found for '{role}'.\nUse: healer, tank, melee, ranged, caster");
             }
         }
 
@@ -158,6 +165,38 @@ namespace RoleGearSync
                     ImGui.Spacing();
                     ImGui.TextColored(new System.Numerics.Vector4(1.0f, 0.5f, 0.0f, 1.0f), "Optimization running...");
                 }
+                    ImGui.Spacing();
+                    ImGui.Separator();
+                    ImGui.Spacing();
+
+                if (ImGui.CollapsingHeader("Settings / Ignored Sets"))
+                {
+                    ImGui.TextWrapped("Check the boxes to exclude specific gearsets from being optimized.");
+                    ImGui.Spacing();
+
+                    var gearsetModule = RaptureGearsetModule.Instance();
+                    for (int i = 0; i < 100; i++)
+                    {
+                        var gs = gearsetModule->GetGearset(i);
+                        // Nur belegte Gearsets anzeigen
+                        if (gs != null && gs->ClassJob != 0) 
+                        {
+                            bool isIgnored = this.Configuration.IgnoredGearsets.Contains(i);
+                            
+                            // i+1, weil die Liste im Spiel bei 1 anfängt, der Index aber bei 0
+                            if (ImGui.Checkbox($"Gearset {i + 1} (Job-ID: {gs->ClassJob})", ref isIgnored))
+                            {
+                                if (isIgnored) 
+                                    this.Configuration.IgnoredGearsets.Add(i);
+                                else 
+                                    this.Configuration.IgnoredGearsets.Remove(i);
+                                
+                                // Direkt speichern, wenn ein Häkchen gesetzt/entfernt wird
+                                this.Configuration.Save(); 
+                            }
+                        }
+                    }
+                }
 
                 ImGui.End();
             }
@@ -187,6 +226,9 @@ namespace RoleGearSync
 
             for (int i = 0; i < 100; i++)
             {
+                // NEU: Wenn das Gearset in der Blacklist ist, direkt überspringen
+                if (this.Configuration.IgnoredGearsets.Contains(i)) continue;
+
                 var gs = gearsetModule->GetGearset(i);
                 if (gs != null && gs->ClassJob != 0)
                 {
@@ -196,9 +238,6 @@ namespace RoleGearSync
                     }
                 }
             }
-
-            return matchingSets;
-        }
 
         private void StartSyncProcess(List<int> gearsetIds)
         {
@@ -227,7 +266,7 @@ namespace RoleGearSync
                 case SyncState.SwitchingJob:
                     if (gearsetsToProcess.Count == 0)
                     {
-                        ChatGui.Print("[RoleGearSync] All jobs successfully optimized!");
+                        ToastGui.ShowNormal("RoleGearSync: All jobs successfully optimized!");
                         currentState = SyncState.Idle;
                         return;
                     }
