@@ -70,17 +70,59 @@ namespace RoleGearSync
 
         private void OnCommand(string command, string args)
         {
-            if (args.ToLower() == "healer")
+            var role = args.ToLower().Trim();
+            var sets = GetGearsetsForRole(role);
+
+            if (sets.Count > 0)
             {
-                // Beispiel: IDs der Heiler-Gearsets (Diese müssten wir später dynamisch auslesen)
-                // Weißmagier, Gelehrter, Astrologe, Weiser
-                StartSyncProcess(new List<int> { 1, 2, 3, 4 });
-                ChatGui.Print("[RoleGearSync] Starte Optimierung für Heiler...");
+                StartSyncProcess(sets);
+                ChatGui.Print($"[RoleGearSync] Starte Optimierung für {sets.Count} {role}-Set(s)...");
             }
             else
             {
-                ChatGui.PrintError("[RoleGearSync] Unbekannte Rolle. Nutze z.B. '/syncgear healer'.");
+                ChatGui.PrintError($"[RoleGearSync] Keine Sets für '{role}' gefunden.\nNutze: healer, tank, melee, ranged, caster");
             }
+        }
+
+        private unsafe List<int> GetGearsetsForRole(string role)
+        {
+            var gearsetModule = RaptureGearsetModule.Instance();
+            var matchingSets = new List<int>();
+
+            // FFXIV Job IDs (Klassen & Jobs)
+            var healers = new HashSet<byte> { 6, 24, 28, 33, 40 }; // Druide, WHM, SCH, AST, SGE
+            var tanks = new HashSet<byte> { 1, 3, 19, 21, 32, 37 }; // GLD, MRD, PLD, WAR, DRK, GNB
+            var melee = new HashSet<byte> { 2, 4, 29, 20, 22, 30, 34, 39, 41 }; // PGL, LNC, ROG, MNK, DRG, NIN, SAM, RPR, VPR
+            var ranged = new HashSet<byte> { 5, 23, 31, 38 }; // ARC, BRD, MCH, DNC
+            var caster = new HashSet<byte> { 7, 26, 25, 27, 35, 36, 42 }; // THM, ACN, BLM, SMN, RDM, BLU, PCT
+
+            HashSet<byte> targetRole = null;
+            switch(role) {
+                case "healer": targetRole = healers; break;
+                case "tank": targetRole = tanks; break;
+                case "melee": targetRole = melee; break;
+                case "ranged": targetRole = ranged; break;
+                case "caster": targetRole = caster; break;
+            }
+
+            if (targetRole == null) return matchingSets;
+
+            // FFXIV erlaubt bis zu 100 Gearsets (Index 0 bis 99)
+            for (int i = 0; i < 100; i++)
+            {
+                var gs = gearsetModule->GetGearset(i);
+                
+                // Prüfen, ob das Set existiert und eine Klasse zugewiesen ist (0 = Abenteurer/Leer)
+                if (gs != null && gs->ClassJob != 0)
+                {
+                    if (targetRole.Contains(gs->ClassJob))
+                    {
+                        matchingSets.Add(i); // i ist der Index des Gearsets
+                    }
+                }
+            }
+
+            return matchingSets;
         }
 
         private void StartSyncProcess(List<int> gearsetIds)
@@ -143,7 +185,7 @@ namespace RoleGearSync
                     recommendModule->SetupForClassJob((byte)ObjectTable.LocalPlayer.ClassJob.RowId);
                     
                     // 2. Wendet die berechnete Ausrüstung auf den Charakter an (NEUE METHODE FÜR DAWNTRAIL)
-                    // FFXIVClientStructs Update: EquipRecommendedGear() anstelle von Equip()
+                    // FFXIVClientStructs Update: EquipRecommendedGear() anstelle von Equip() - Jetzt mit () Klammern!
                     recommendModule->EquipRecommendedGear();
                     
                     waitFrames = 10; // Kurz warten, bis das Spiel die Items angelegt hat
