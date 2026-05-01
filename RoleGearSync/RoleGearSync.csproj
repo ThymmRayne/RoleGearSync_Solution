@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Wir nutzen das offizielle Dalamud SDK -->
+<Project Sdk="Dalamud.NET.Sdk/12.0.2">
+
+  <PropertyGroup>
+    <Authors>Cycrow</Authors>
+    <Company>-</Company>
+    <Version>1.0.0.0</Version>
+    <Description>Synchronisiert Ausrüstung für FFXIV Rollen.</Description>
+    <Copyright></Copyright>
+    <PackageProjectUrl>[https://github.com/ThymmRayne/RoleGearSync](https://github.com/ThymmRayne/RoleGearSync)</PackageProjectUrl>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+</Project>
