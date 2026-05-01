@@ -4,6 +4,8 @@ using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using Dalamud.Bindings.ImGui;
 using System.Collections.Generic;
+using System;
+using Dalamud.Game.ClientState.Conditions;
 
 namespace RoleGearSync
 {
@@ -19,6 +21,7 @@ namespace RoleGearSync
         private IFramework Framework { get; init; }
         private IClientState ClientState { get; init; }
         private IObjectTable ObjectTable { get; init; }
+        private ICondition Condition { get; init; }
 
         // UI State
         private bool isUiVisible = false;
@@ -39,7 +42,8 @@ namespace RoleGearSync
         private SyncState currentState = SyncState.Idle;
         private Queue<int> gearsetsToProcess = new Queue<int>();
         private int currentTargetGearset = -1;
-        private int waitFrames = 0;
+        private DateTime waitTimer;
+        private byte expectedClassJob;
 
         public Plugin(
             IDalamudPluginInterface pluginInterface,
@@ -47,7 +51,8 @@ namespace RoleGearSync
             IChatGui chatGui,
             IFramework framework,
             IClientState clientState,
-            IObjectTable objectTable)
+            IObjectTable objectTable,
+            ICondition condition)
         {
             this.PluginInterface = pluginInterface;
             this.CommandManager = commandManager;
@@ -55,6 +60,7 @@ namespace RoleGearSync
             this.Framework = framework;
             this.ClientState = clientState;
             this.ObjectTable = objectTable;
+            this.Condition = condition;
 
             // Command registrieren
             this.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
@@ -102,6 +108,13 @@ namespace RoleGearSync
 
         private void ExecuteSync(string role)
         {
+            // Check if we are in combat or in a duty
+            if (Condition[ConditionFlag.InCombat] || Condition[ConditionFlag.BoundByDuty])
+            {
+                ChatGui.PrintError("[RoleGearSync] Cannot optimize gear during combat or inside a duty.");
+                return;
+            }
+
             var sets = GetGearsetsForRole(role);
 
             if (sets.Count > 0)
@@ -218,54 +231,67 @@ namespace RoleGearSync
                         currentState = SyncState.Idle;
                         return;
                     }
-
                     currentTargetGearset = gearsetsToProcess.Dequeue();
-                    
+                                        
                     var gearsetModule = RaptureGearsetModule.Instance();
-                    gearsetModule->EquipGearset(currentTargetGearset);
+                    var gs = gearsetModule->GetGearset(currentTargetGearset);
                     
-                    waitFrames = 60;
+                    // Wir merken uns, in welchen Job wir gerade wechseln wollen
+                    if (gs != null) expectedClassJob = gs->ClassJob; 
+                    
+                    gearsetModule->EquipGearset(currentTargetGearset);
+                                        
+                    // Maximal 2 Sekunden warten, bis der Job-Wechsel durch ist
+                    waitTimer = DateTime.Now.AddSeconds(2); 
                     currentState = SyncState.WaitingForSwitch;
                     break;
 
                 case SyncState.WaitingForSwitch:
-                    waitFrames--;
-                    if (waitFrames <= 0)
+                    // Prüfen, ob der Spieler den Job gewechselt hat
+                    if (ObjectTable.LocalPlayer.ClassJob.RowId == expectedClassJob)
+                    {
                         currentState = SyncState.SetupOptimization;
+                    }
+                    // Timeout-Schutz: Falls der Jobwechsel fehlschlägt (z.B. Inventar voll)
+                    else if (DateTime.Now > waitTimer)
+                    {
+                        ChatGui.PrintError($"[RoleGearSync] Timeout while switching to gearset {currentTargetGearset}. Aborting.");
+                        currentState = SyncState.Idle;
+                    }
                     break;
 
                 case SyncState.SetupOptimization:
                     var recommendModuleSetup = RecommendEquipModule.Instance();
                     recommendModuleSetup->SetupForClassJob((byte)ObjectTable.LocalPlayer.ClassJob.RowId);
-                    
-                    waitFrames = 15;
+                                        
+                    // 250 Millisekunden warten, damit das Spiel Zeit hat, das beste Gear zu berechnen
+                    waitTimer = DateTime.Now.AddMilliseconds(250);
                     currentState = SyncState.WaitingForCalculation;
                     break;
 
                 case SyncState.WaitingForCalculation:
-                    waitFrames--;
-                    if (waitFrames <= 0)
+                    if (DateTime.Now >= waitTimer)
                         currentState = SyncState.EquippingGear;
                     break;
 
                 case SyncState.EquippingGear:
                     var recommendModuleEquip = RecommendEquipModule.Instance();
                     recommendModuleEquip->EquipRecommendedGear();
-                    
-                    waitFrames = 30;
+                                        
+                    // 500 Millisekunden warten, bis die Server-Anfrage für das Ausrüsten durch ist
+                    waitTimer = DateTime.Now.AddMilliseconds(500);
                     currentState = SyncState.WaitingForEquip;
                     break;
-                    
+                                    
                 case SyncState.WaitingForEquip:
-                    waitFrames--;
-                    if (waitFrames <= 0)
+                    if (DateTime.Now >= waitTimer)
                         currentState = SyncState.SavingGearset;
                     break;
-                    
+                                    
                 case SyncState.SavingGearset:
                     var gearsetModuleUpdate = RaptureGearsetModule.Instance();
                     gearsetModuleUpdate->UpdateGearset(currentTargetGearset);
-                    
+                                        
                     currentState = SyncState.SwitchingJob;
                     break;
             }
