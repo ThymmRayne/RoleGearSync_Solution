@@ -226,7 +226,7 @@ namespace RoleGearSync
 
             for (int i = 0; i < 100; i++)
             {
-                // NEU: Wenn das Gearset in der Blacklist ist, direkt überspringen
+                // Wenn das Gearset in der Blacklist ist, direkt überspringen
                 if (this.Configuration.IgnoredGearsets.Contains(i)) continue;
 
                 var gs = gearsetModule->GetGearset(i);
@@ -238,6 +238,9 @@ namespace RoleGearSync
                     }
                 }
             }
+            
+            return matchingSets;
+        } 
 
         private void StartSyncProcess(List<int> gearsetIds)
         {
