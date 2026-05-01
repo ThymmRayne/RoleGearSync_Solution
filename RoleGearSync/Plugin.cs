@@ -59,7 +59,7 @@ namespace RoleGearSync
             // Command registrieren
             this.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
             {
-                HelpMessage = "Öffnet das RoleGearSync Menü oder startet direkt (z.B. /syncgear healer)"
+                HelpMessage = "Opens the RoleGearSync menu or starts directly (e.g., /syncgear healer)"
             });
 
             // In den Game-Loop für unsere State Machine einklinken
@@ -103,11 +103,11 @@ namespace RoleGearSync
             if (sets.Count > 0)
             {
                 StartSyncProcess(sets);
-                ChatGui.Print($"[RoleGearSync] Starte Optimierung für {sets.Count} {role}-Set(s)...");
+                ChatGui.Print($"[RoleGearSync] Starting optimization for {sets.Count} {role}-Set(s)...");
             }
             else
             {
-                ChatGui.PrintError($"[RoleGearSync] Keine Sets für '{role}' gefunden.\nNutze: healer, tank, melee, ranged, caster");
+                ChatGui.PrintError($"[RoleGearSync] No sets found for '{role}'.\nUse: healer, tank, melee, ranged, caster");
             }
         }
 
@@ -116,30 +116,30 @@ namespace RoleGearSync
             if (!isUiVisible) return;
 
             // Zeichnet ein einfaches Fenster, das sich an den Inhalt anpasst
-            if (ImGui.Begin("RoleGearSync Menü", ref isUiVisible, ImGuiWindowFlags.AlwaysAutoResize))
+            if (ImGui.Begin("RoleGearSync Menu", ref isUiVisible, ImGuiWindowFlags.AlwaysAutoResize))
             {
-                ImGui.Text("Wähle eine Rolle zum Optimieren aus:");
+                ImGui.Text("Choose a role to optimize:");
                 ImGui.Separator();
                 ImGui.Spacing();
 
-                // Deaktiviere Buttons, falls gerade eine Optimierung läuft
+                // Disable buttons if optimization is currently running
                 if (currentState != SyncState.Idle)
                 {
                     ImGui.BeginDisabled();
                 }
 
                 // UI Buttons
-                if (ImGui.Button("Tanks optimieren", new System.Numerics.Vector2(200, 30))) ExecuteSync("tank");
-                if (ImGui.Button("Heiler optimieren", new System.Numerics.Vector2(200, 30))) ExecuteSync("healer");
-                if (ImGui.Button("Nahkämpfer optimieren", new System.Numerics.Vector2(200, 30))) ExecuteSync("melee");
-                if (ImGui.Button("Fernkämpfer optimieren", new System.Numerics.Vector2(200, 30))) ExecuteSync("ranged");
-                if (ImGui.Button("Magier optimieren", new System.Numerics.Vector2(200, 30))) ExecuteSync("caster");
+                if (ImGui.Button("Optimize Tanks", new System.Numerics.Vector2(200, 30))) ExecuteSync("tank");
+                if (ImGui.Button("Optimize Healers", new System.Numerics.Vector2(200, 30))) ExecuteSync("healer");
+                if (ImGui.Button("Optimize Melee", new System.Numerics.Vector2(200, 30))) ExecuteSync("melee");
+                if (ImGui.Button("Optimize Ranged", new System.Numerics.Vector2(200, 30))) ExecuteSync("ranged");
+                if (ImGui.Button("Optimize Caster", new System.Numerics.Vector2(200, 30))) ExecuteSync("caster");
 
                 if (currentState != SyncState.Idle)
                 {
                     ImGui.EndDisabled();
                     ImGui.Spacing();
-                    ImGui.TextColored(new System.Numerics.Vector4(1.0f, 0.5f, 0.0f, 1.0f), "Optimierung läuft...");
+                    ImGui.TextColored(new System.Numerics.Vector4(1.0f, 0.5f, 0.0f, 1.0f), "Optimization running...");
                 }
 
                 ImGui.End();
@@ -187,7 +187,7 @@ namespace RoleGearSync
         {
             if (currentState != SyncState.Idle)
             {
-                ChatGui.PrintError("[RoleGearSync] Ein Sync-Prozess läuft bereits!");
+                ChatGui.PrintError("[RoleGearSync] A sync process is already running!");
                 return;
             }
 
@@ -210,7 +210,7 @@ namespace RoleGearSync
                 case SyncState.SwitchingJob:
                     if (gearsetsToProcess.Count == 0)
                     {
-                        ChatGui.Print("[RoleGearSync] Alle Jobs erfolgreich optimiert!");
+                        ChatGui.Print("[RoleGearSync] All jobs successfully optimized!");
                         currentState = SyncState.Idle;
                         return;
                     }
