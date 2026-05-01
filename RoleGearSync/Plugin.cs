@@ -67,6 +67,9 @@ namespace RoleGearSync
             
             // In den UI-Loop von Dalamud einklinken
             this.PluginInterface.UiBuilder.Draw += DrawUI;
+
+            // Hauptfenster registrieren (behebt die Warnung)
+            this.PluginInterface.UiBuilder.OpenMainUi += () => isUiVisible = true;
             
             // Optional: Fenster über die Plugin-Einstellungen öffnen
             this.PluginInterface.UiBuilder.OpenConfigUi += () => isUiVisible = true;
@@ -76,6 +79,7 @@ namespace RoleGearSync
         {
             // Event-Handler sauber abmelden
             this.PluginInterface.UiBuilder.Draw -= DrawUI;
+            this.PluginInterface.UiBuilder.OpenMainUi -= () => isUiVisible = true;
             this.PluginInterface.UiBuilder.OpenConfigUi -= () => isUiVisible = true;
             this.Framework.Update -= OnFrameworkUpdate;
             this.CommandManager.RemoveHandler(CommandName);
