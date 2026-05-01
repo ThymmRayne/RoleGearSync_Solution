@@ -200,7 +200,7 @@ namespace RoleGearSync
                                 if (gs != null)
                                 {
                                     // Wir lesen den echten Namen deines Gearsets aus dem Speicher
-                                    string setName = MemoryHelper.ReadStringNullTerminated((nint)gs->Name);
+                                    string setName = gs->NameString;
                                     
                                     // Ist der Name leer, existiert in diesem Slot kein Gearset
                                     if (string.IsNullOrEmpty(setName)) continue;
