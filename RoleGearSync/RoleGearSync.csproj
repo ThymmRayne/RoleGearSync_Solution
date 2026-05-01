@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Wir nutzen das Dalamud SDK ohne feste Version, um Kompatibilitätsprobleme zu vermeiden -->
-<Project Sdk="Dalamud.NET.Sdk">
+<!-- Wir nutzen das offizielle Dalamud SDK -->
+<Project Sdk="Dalamud.NET.Sdk/15.0.0">
 
   <PropertyGroup>
     <Authors>Cycrow</Authors>
@@ -18,16 +18,10 @@
     <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <!-- Sicherstellung des Pfads zu den Dalamud-Bibliotheken -->
-    <DalamudLibPath>$(appdata)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
   </PropertyGroup>
 
+  <!-- Fix für ImGui in Dawntrail / API 15 -->
   <ItemGroup>
-    <!-- Manueller Fix für das verschobene ImGui in API 15 -->
-    <Reference Include="Dalamud.Bindings.ImGui">
-      <HintPath>$(DalamudLibPath)Dalamud.Bindings.ImGui.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
     <Reference Include="ImGui.NET">
       <HintPath>$(DalamudLibPath)Dalamud.Bindings.ImGui.dll</HintPath>
       <Private>false</Private>
