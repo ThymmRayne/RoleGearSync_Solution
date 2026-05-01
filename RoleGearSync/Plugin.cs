@@ -182,6 +182,18 @@ namespace RoleGearSync
             {
                 if (ImGui.Begin("RoleGearSync Settings", ref isConfigVisible, ImGuiWindowFlags.AlwaysAutoResize))
                 {
+
+                    bool reapplyGlamour = this.Configuration.ReapplyGlamour;
+                    if (ImGui.Checkbox("Re-apply linked Glamour Plates after optimization", ref reapplyGlamour))
+                    {
+                        this.Configuration.ReapplyGlamour = reapplyGlamour;
+                        this.Configuration.Save();
+                    }
+                    
+                    ImGui.Spacing();
+                    ImGui.Separator();
+                    ImGui.Spacing();
+
                     ImGui.TextWrapped("Check the boxes to exclude specific gearsets from being optimized.");
                     ImGui.Spacing();
 
@@ -374,6 +386,12 @@ namespace RoleGearSync
                 case SyncState.SavingGearset:
                     var gearsetModuleUpdate = RaptureGearsetModule.Instance();
                     gearsetModuleUpdate->UpdateGearset(currentTargetGearset);
+                    
+                    // NEU: Das Set direkt nochmal ausrüsten, um verknüpfte Projektionsplatten anzuwenden
+                    if (this.Configuration.ReapplyGlamour)
+                    {
+                        gearsetModuleUpdate->EquipGearset(currentTargetGearset);
+                    }
                                         
                     currentState = SyncState.SwitchingJob;
                     break;

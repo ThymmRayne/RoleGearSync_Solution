@@ -13,6 +13,8 @@ namespace RoleGearSync
         // Hier speichern wir die IDs der Gearsets, die NICHT optimiert werden sollen
         public HashSet<int> IgnoredGearsets { get; set; } = new HashSet<int>();
 
+        public bool ReapplyGlamour { get; set; } = true;
+
         [NonSerialized]
         private IDalamudPluginInterface? pluginInterface;
 
