@@ -143,10 +143,6 @@ namespace RoleGearSync
                     currentState = SyncState.SavingGearset;
                     break;
                     
-                    waitFrames = 10; // Kurz warten, bis das Spiel die Items angelegt hat
-                    currentState = SyncState.SavingGearset;
-                    break;
-
                 case SyncState.SavingGearset:
                     waitFrames--;
                     if (waitFrames <= 0)
