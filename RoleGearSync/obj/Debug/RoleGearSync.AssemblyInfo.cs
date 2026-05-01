@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("Synchronisiert Ausrüstung für FFXIV Rollen.")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0.0+52cc8e65572923680745c61145fe23e870f872bd")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0.0+b2f69767ca099eec74a355cac77c41e485ea261d")]
 [assembly: System.Reflection.AssemblyProductAttribute("RoleGearSync")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RoleGearSync")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
