@@ -5,7 +5,7 @@
   "Punchline": "Synchronizes gear sets for all jobs within a role.",
   "Description": "A tool for Omni-100 players. Updates and saves the 'Optimize Gear' function for all healers, tanks, etc. with a single click.",
   "RepoUrl": "[https://github.com/ThymmRayne/RoleGearSync](https://github.com/ThymmRayne/RoleGearSync)",
-  "IconUrl": "https://raw.githubusercontent.com/ThymmRayne/RoleGearSync_Solution/master/icon.png",
+  "IconUrl": "https://raw.githubusercontent.com/ThymmRayne/RoleGearSync_Solution/main/icon.png",
   "Tags": [
     "gear",
     "sync",
