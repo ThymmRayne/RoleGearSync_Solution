@@ -17,7 +17,7 @@ Currently, this plugin is in development. To install it manually:
 1. Open the Dalamud Settings in-game (`/xlsettings`).
 2. Go to the **Experimental** tab.
 3. Add the following URL to your Custom Plugin Repositories:
-   `https://raw.githubusercontent.com/ThymmRayne/RoleGearSync/main/repo.json`
+   `https://raw.githubusercontent.com/ThymmRayne/RoleGearSync_Solution/main/repo.json`
 4. Search for "RoleGearSync" in the Plugin Installer (`/xlplugins`).
 
 ## Usage
