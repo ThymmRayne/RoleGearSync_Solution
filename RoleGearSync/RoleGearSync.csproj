@@ -4,7 +4,7 @@
     <Authors>Cycrow</Authors>
     <Company>-</Company>
     <Version>1.0.0.0</Version>
-    <Description>Synchronizes gear sets for all jobs within a role.</Description>
+    <Description>Synchronizes gear sets and glamour plates for all jobs within a role.</Description>
     <PackageProjectUrl>https://github.com/ThymmRayne/RoleGearSync_Solution</PackageProjectUrl>
   </PropertyGroup>
 
