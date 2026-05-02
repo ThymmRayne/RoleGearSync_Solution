@@ -1,0 +1,9 @@
+C:\Users\domih\source\repos\RoleGearSync_Solution\RoleGearSync\bin\Release\RoleGearSync.deps.json
+C:\Users\domih\source\repos\RoleGearSync_Solution\RoleGearSync\bin\Release\RoleGearSync.dll
+C:\Users\domih\source\repos\RoleGearSync_Solution\RoleGearSync\obj\Release\RoleGearSync.csproj.AssemblyReference.cache
+C:\Users\domih\source\repos\RoleGearSync_Solution\RoleGearSync\obj\Release\RoleGearSync.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\domih\source\repos\RoleGearSync_Solution\RoleGearSync\obj\Release\RoleGearSync.AssemblyInfoInputs.cache
+C:\Users\domih\source\repos\RoleGearSync_Solution\RoleGearSync\obj\Release\RoleGearSync.AssemblyInfo.cs
+C:\Users\domih\source\repos\RoleGearSync_Solution\RoleGearSync\obj\Release\RoleGearSync.csproj.CoreCompileInputs.cache
+C:\Users\domih\source\repos\RoleGearSync_Solution\RoleGearSync\obj\Release\RoleGearSync.sourcelink.json
+C:\Users\domih\source\repos\RoleGearSync_Solution\RoleGearSync\obj\Release\RoleGearSync.dll
