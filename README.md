@@ -10,7 +10,7 @@ RoleGearSync is a Quality-of-Life (QoL) plugin for Final Fantasy XIV (XIVLaunche
 - **Smart Ignore List:** Exclude specific gearsets (e.g., Ultimate BiS or Leveling sets) from the synchronization process via a dedicated settings menu.
 - **Modern UI:** Clean ImGui-based interface with a searchable and scrollable gearset list.
 - **Safe Execution:** Built-in security checks to prevent execution during combat or inside duties.
-- **Toast Notifications:** Non-intrusive on-screen feedback using the native FFXIV toast system.
+- **Toast Notifications:** On-screen feedback using the native FFXIV toast system.
 
 ## Installation
 Currently, this plugin is in development. To install it manually:
