@@ -211,6 +211,8 @@ namespace RoleGearSync
                     if (hasFullyBondedGear)
                     {
                         ChatGui.Print("[RoleGearSync] TIP: Your currently equipped gear has 100% Spiritbond. Don't forget to extract Materia later!");
+
+                        ToastGui.ShowError("RoleGearSync: Your currently equipped gear has 100% Spiritbond. Don't forget to extract Materia later!");
                     }
                 }
             }
@@ -264,7 +266,9 @@ namespace RoleGearSync
             // -----------------------------------------
             if (isUiVisible)
             {
-                if (ImGui.Begin("RoleGearSync Menu", ref isUiVisible, ImGuiWindowFlags.AlwaysAutoResize))
+                // Startgröße festlegen, danach frei skalierbar
+                ImGui.SetNextWindowSize(new System.Numerics.Vector2(250, 350), ImGuiCond.FirstUseEver);
+                if (ImGui.Begin("RoleGearSync Menu", ref isUiVisible))
                 {
                     ImGui.Text("Choose a role to optimize:");
                     ImGui.Separator();
@@ -280,6 +284,18 @@ namespace RoleGearSync
                     if (ImGui.Button("Optimize Melee", new System.Numerics.Vector2(200, 30))) ExecuteSync("melee");
                     if (ImGui.Button("Optimize Ranged", new System.Numerics.Vector2(200, 30))) ExecuteSync("ranged");
                     if (ImGui.Button("Optimize Caster", new System.Numerics.Vector2(200, 30))) ExecuteSync("caster");
+
+                    // --- NEW: Settings Button im Hauptmenü ---
+                    ImGui.Spacing();
+                    ImGui.Separator();
+                    ImGui.Spacing();
+
+                    if (ImGui.Button("Settings / Profile", new System.Numerics.Vector2(200, 30))) 
+                    {
+                        // Schaltet das Einstellungsfenster an oder aus
+                        isConfigVisible = !isConfigVisible; 
+                    }
+                    // -----------------------------------------
 
                     if (currentState != SyncState.Idle)
                     {
@@ -313,7 +329,9 @@ namespace RoleGearSync
             // -----------------------------------------
             if (isConfigVisible)
             {
-                if (ImGui.Begin("RoleGearSync Settings", ref isConfigVisible, ImGuiWindowFlags.AlwaysAutoResize))
+                // Startgröße für die Settings festlegen, danach frei skalierbar
+                ImGui.SetNextWindowSize(new System.Numerics.Vector2(550, 600), ImGuiCond.FirstUseEver);
+                if (ImGui.Begin("RoleGearSync Settings", ref isConfigVisible))
                 {
 
                     bool reapplyGlamour = this.Configuration.ReapplyGlamour;
@@ -396,7 +414,8 @@ namespace RoleGearSync
                     ImGui.Spacing();
 
                     // Scrollbarer Bereich (Child-Window), damit das Hauptfenster nicht explodiert
-                    if (ImGui.BeginChild("GearsetListScroll", new System.Numerics.Vector2(450, 350), true))
+                    // 0, 0 bedeutet: Breite und Höhe passen sich automatisch dem Fenster an!
+                    if (ImGui.BeginChild("GearsetListScroll", new System.Numerics.Vector2(0, 0), true))
                     {
                         // Schicke Tabelle mit 4 Spalten und abwechselnden Zeilenfarben
                         if (ImGui.BeginTable("GearsetTable", 4, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit))
@@ -596,10 +615,12 @@ namespace RoleGearSync
                                 if (oldILvl != newILvl)
                                 {
                                     ChatGui.Print($"[+] {setName} (Set {kvp.Key + 1}): iLvl {oldILvl} -> {newILvl}");
+                                    ToastGui.ShowNormal($"[RoleGearSync] Gearset {kvp.Key + 1} ({setName}): iLvl {oldILvl} -> {newILvl}");
                                 }
                                 else
                                 {
                                     ChatGui.Print($"[-] {setName} (Set {kvp.Key + 1}): iLvl unchanged ({newILvl})");
+                                    ToastGui.ShowNormal($"[RoleGearSync] Gearset {kvp.Key + 1} ({setName}): iLvl unchanged ({newILvl})");
                                 }
                             }
                         }
@@ -666,16 +687,13 @@ namespace RoleGearSync
                     break;
                                     
                 case SyncState.SavingGearset:
-                    // --- NEW: Empty slot warning (e.g., missing rings) ---
+                    // --- Empty slot warning (e.g., missing rings) ---
                     var invManager = InventoryManager.Instance();
                     if (invManager != null)
                     {
                         var equipContainer = invManager->GetInventoryContainer(InventoryType.EquippedItems);
                         if (equipContainer != null)
                         {
-                            // Indices: 0=MainHand, 2=Head, 3=Body, 4=Hands, 6=Legs, 7=Feet, 
-                            // 8=Ears, 9=Neck, 10=Wrists, 11=RingRight, 12=RingLeft
-                            // We intentionally skip 1 (OffHand) and 13 (SoulCrystal).
                             int[] slotsToCheck = { 0, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12 };
                             bool hasEmptySlot = false;
 
@@ -692,28 +710,64 @@ namespace RoleGearSync
                             if (hasEmptySlot)
                             {
                                 ChatGui.PrintError($"[RoleGearSync] WARNING: Empty gear slot detected on Set {currentTargetGearset + 1}! Check your rings.");
+                                ToastGui.ShowError($"[RoleGearSync] WARNING: Empty gear slot detected on Set {currentTargetGearset + 1}! Check your rings.");
                             }
+
+                            // --- NEW: Materia Check ---
+                            // Wir prüfen, ob auf den Items überhaupt Materia gesockelt ist.
+                            bool missingMateria = false;
+                            
+                            foreach (int slot in slotsToCheck)
+                            {
+                                var item = equipContainer->GetInventorySlot(slot);
+                                
+                                // Wenn dort ein Item existiert...
+                                if (item != null && item->ItemId != 0)
+                                {
+                                    // FFXIV speichert Materia in einem Array. 
+                                    // Ist der 1. Eintrag 0, ist gar keine Materia auf dem Item.
+                                    if (item->Materia[0] == 0)
+                                    {
+                                        missingMateria = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (missingMateria)
+                            {
+                                // Print statt PrintError, da es "nur" ein hilfreicher Tipp ist und kein kritischer Fehler
+                                ChatGui.Print($"[RoleGearSync] TIP: Some gear on Set {currentTargetGearset + 1} has completely empty Materia slots!");
+                                ToastGui.ShowNormal($"[RoleGearSync] TIP: Some gear on Set {currentTargetGearset + 1} has completely empty Materia slots!");
+                            }
+                            // --------------------------
                         }
                     }
-                    // ------------------------------------------------------
+                    
                     var gearsetModuleUpdate = RaptureGearsetModule.Instance();
+                    
+                    // Das Set normal speichern
                     gearsetModuleUpdate->UpdateGearset(currentTargetGearset);
                                          
-                    // --- CHANGED: Apply Glamour Plate ---
+                    // --- CHANGED: Apply Glamour Plate directly with the new API trick ---
                     if (this.Configuration.ReapplyGlamour)
                     {
-                        // Check if we have a specific plate linked in our plugin
                         if (this.Configuration.LinkedGlamourPlates.TryGetValue(currentTargetGearset, out byte linkedPlate) && linkedPlate > 0)
                         {
-                            // Link the plate to the gearset internally (0-19 index for plates 1-20)
+                            // Link die Platte sicherheitshalber trotzdem noch visuell im Menü
                             gearsetModuleUpdate->LinkGlamourPlate(currentTargetGearset, (byte)(linkedPlate - 1));
+                            
+                            // Dein gefundener Trick: Set ausrüsten UND direkt die Platte 1-20 mitgeben!
+                            gearsetModuleUpdate->EquipGearset(currentTargetGearset, linkedPlate);
                         }
-                        
-                        // Equip the set again to trigger the glamour application
-                        gearsetModuleUpdate->EquipGearset(currentTargetGearset);
+                        else
+                        {
+                            // Wenn "None" gewählt ist, rüsten wir es einfach ganz normal aus
+                            gearsetModuleUpdate->EquipGearset(currentTargetGearset);
+                        }
                     }
-                    // ------------------------------------
                                         
+                    // Direkt weiter zum nächsten Job, keine Wartezeit mehr!
                     currentState = SyncState.SwitchingJob;
                     break;
             }
