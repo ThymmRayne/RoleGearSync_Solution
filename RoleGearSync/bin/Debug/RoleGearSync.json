@@ -19,6 +19,7 @@
   "LoadSync": false,
   "CanUnloadAsync": false,
   "LoadPriority": 0,
+  "IconUrl": "https://raw.githubusercontent.com/ThymmRayne/RoleGearSync_Solution/main/icon.png",
   "Punchline": "Synchronizes gear sets for all jobs within a role.",
   "AcceptsFeedback": true
 }
