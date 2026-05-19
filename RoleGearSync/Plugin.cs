@@ -188,7 +188,7 @@ namespace RoleGearSync
                 }
             }
 
-            // --- NEW: Spiritbond / Materia extraction warning ---
+                        // --- NEW: Spiritbond / Materia extraction warning ---
             var spiritbondInvManager = InventoryManager.Instance();
             if (spiritbondInvManager != null)
             {
@@ -217,6 +217,7 @@ namespace RoleGearSync
                 }
             }
             // --- NEW: Gear Condition / Durability warning ---
+            // Reusing the same InventoryManager instance instead of re-fetching
             if (spiritbondInvManager != null)
             {
                 var equipContainer = spiritbondInvManager->GetInventoryContainer(InventoryType.EquippedItems);
@@ -505,32 +506,25 @@ namespace RoleGearSync
             }
         }
 
-        private unsafe List<int> GetGearsetsForRole(string role, string profileName)
+                private unsafe List<int> GetGearsetsForRole(string role, string profileName)
         {
             var gearsetModule = RaptureGearsetModule.Instance();
             var matchingSets = new List<int>();
 
-            var healers = new HashSet<byte> { 6, 24, 28, 33, 40 };
-            var tanks = new HashSet<byte> { 1, 3, 19, 21, 32, 37 };
-            var melee = new HashSet<byte> { 2, 4, 29, 20, 22, 30, 34, 39, 41 };
-            var ranged = new HashSet<byte> { 5, 23, 31, 38 };
-            var caster = new HashSet<byte> { 7, 26, 25, 27, 35, 36, 42 };
-
+            // --- FIXED: Use Constants.RoleJobAssignments instead of hardcoded values ---
             HashSet<byte>? targetRole = null;
-            switch(role) {
-                case "healer": targetRole = healers; break;
-                case "tank": targetRole = tanks; break;
-                case "melee": targetRole = melee; break;
-                case "ranged": targetRole = ranged; break;
-                case "caster": targetRole = caster; break;
+            if (Constants.RoleJobAssignments.TryGetValue(role, out var roleJobs))
+            {
+                targetRole = roleJobs;
             }
 
             if (targetRole == null) return matchingSets;
 
             for (int i = 0; i < 100; i++)
             {
-                // --- CHANGED: Use the passed profileName ---
-                if (this.Configuration.IgnoreProfiles[profileName].Contains(i)) continue;
+                // --- FIXED: Check if profile exists first to avoid KeyNotFoundException ---
+                if (this.Configuration.IgnoreProfiles.ContainsKey(profileName) && 
+                    this.Configuration.IgnoreProfiles[profileName].Contains(i)) continue;
 
                 var gs = gearsetModule->GetGearset(i);
                 if (gs != null && gs->ClassJob != 0)
@@ -543,7 +537,7 @@ namespace RoleGearSync
             }
             
             return matchingSets;
-        } 
+        }  
 
         private unsafe void StartSyncProcess(List<int> gearsetIds)
         {
