@@ -1,6 +1,7 @@
 using System;
+using System.Collections.Generic;
 
-amespace RoleGearSync
+namespace RoleGearSync
 {
     /// <summary>
     /// Enthält alle zentralen, hartkodierten Konstanten des Plugins.

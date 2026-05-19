@@ -189,10 +189,9 @@ namespace RoleGearSync
             }
 
                         // --- NEW: Spiritbond / Materia extraction warning ---
-            var spiritbondInvManager = InventoryManager.Instance();
-            if (spiritbondInvManager != null)
+            if (invManager != null)
             {
-                var equipContainer = spiritbondInvManager->GetInventoryContainer(InventoryType.EquippedItems);
+                var equipContainer = invManager->GetInventoryContainer(InventoryType.EquippedItems);
                 if (equipContainer != null)
                 {
                     bool hasFullyBondedGear = false;
@@ -218,9 +217,9 @@ namespace RoleGearSync
             }
             // --- NEW: Gear Condition / Durability warning ---
             // Reusing the same InventoryManager instance instead of re-fetching
-            if (spiritbondInvManager != null)
+            if (invManager != null)
             {
-                var equipContainer = spiritbondInvManager->GetInventoryContainer(InventoryType.EquippedItems);
+                var equipContainer = invManager->GetInventoryContainer(InventoryType.EquippedItems);
                 if (equipContainer != null)
                 {
                     bool hasBrokenGear = false;
@@ -688,6 +687,9 @@ namespace RoleGearSync
                         var equipContainer = invManager->GetInventoryContainer(InventoryType.EquippedItems);
                         if (equipContainer != null)
                         {
+                            // 0: MainHand, 2: Head, 3: Body, 4: Hands, (5 is deprecated Waist), 6: Legs, 7: Feet
+                            // 8: Ears, 9: Neck, 10: Wrists, 11: RightRing, 12: LeftRing
+                            // 1 (OffHand) is omitted because most jobs don't use an offhand.
                             int[] slotsToCheck = { 0, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12 };
                             bool hasEmptySlot = false;
 

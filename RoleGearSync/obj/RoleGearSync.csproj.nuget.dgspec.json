@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\domih\\source\\repos\\RoleGearSync_Solution\\RoleGearSync\\RoleGearSync.csproj": {}
+    "c:\\Users\\domih\\source\\repos\\RoleGearSync_Solution\\RoleGearSync\\RoleGearSync.csproj": {}
   },
   "projects": {
-    "C:\\Users\\domih\\source\\repos\\RoleGearSync_Solution\\RoleGearSync\\RoleGearSync.csproj": {
+    "c:\\Users\\domih\\source\\repos\\RoleGearSync_Solution\\RoleGearSync\\RoleGearSync.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\domih\\source\\repos\\RoleGearSync_Solution\\RoleGearSync\\RoleGearSync.csproj",
+        "projectUniqueName": "c:\\Users\\domih\\source\\repos\\RoleGearSync_Solution\\RoleGearSync\\RoleGearSync.csproj",
         "projectName": "RoleGearSync",
-        "projectPath": "C:\\Users\\domih\\source\\repos\\RoleGearSync_Solution\\RoleGearSync\\RoleGearSync.csproj",
+        "projectPath": "c:\\Users\\domih\\source\\repos\\RoleGearSync_Solution\\RoleGearSync\\RoleGearSync.csproj",
         "packagesPath": "C:\\Users\\domih\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\domih\\source\\repos\\RoleGearSync_Solution\\RoleGearSync\\obj\\",
+        "outputPath": "c:\\Users\\domih\\source\\repos\\RoleGearSync_Solution\\RoleGearSync\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

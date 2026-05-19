@@ -1,5 +1,6 @@
 using Dalamud.Game.ClientState.Conditions;
-using Dalamud.Game.Services;
+using Dalamud.Plugin.Services;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using System;
 
 namespace RoleGearSync
@@ -13,7 +14,7 @@ namespace RoleGearSync
         /// <param name="chatGui">Service für Chat-Nachrichten.</param>
         /// <param name="toastGui">Service für grafisches UI-Feedback.</param>
         /// <returns>True, wenn keine kritischen Fehler gefunden wurden; sonst False.</returns>
-        public static bool CheckGearStatus(IChatGui chatGui, IToastGui toastGui)
+        public static unsafe bool CheckGearStatus(IChatGui chatGui, IToastGui toastGui)
         {
             var spiritbondInvManager = InventoryManager.Instance();
 
@@ -53,9 +54,9 @@ namespace RoleGearSync
                 }
 
                 // --- Materia Check ---
-                // Überprüfen, ob der erste Eintrag in einem potenziellen Materia-Array 0 ist.
-                // Dies ist eine starke Annahme und muss im Spiel kontextualisiert werden, aber für diesen Scope reicht es.
-                if (item->Materia?.Length > 0 && item->Materia[0] == 0)
+                // FFXIV stores Materia in an array. 
+                // If the first entry is 0, there is no Materia on the item.
+                if (item->Materia[0] == 0)
                 {
                     missingMateria = true;
                 }

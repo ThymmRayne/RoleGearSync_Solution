@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "vLj0bggC4dY=",
+  "dgSpecHash": "3MF6+KdSLrU=",
   "success": true,
-  "projectFilePath": "C:\\Users\\domih\\source\\repos\\RoleGearSync_Solution\\RoleGearSync\\RoleGearSync.csproj",
+  "projectFilePath": "c:\\Users\\domih\\source\\repos\\RoleGearSync_Solution\\RoleGearSync\\RoleGearSync.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\domih\\.nuget\\packages\\dalamudpackager\\15.0.0\\dalamudpackager.15.0.0.nupkg.sha512",
     "C:\\Users\\domih\\.nuget\\packages\\dotnet.reproduciblebuilds\\1.2.39\\dotnet.reproduciblebuilds.1.2.39.nupkg.sha512"
